@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg fixed-top bg-body-tertiary">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" routerLink="/">ayigo-<span class="text-danger">Shop</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav m-auto mb-2 mb-lg-0">
+                <!-- <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active-link" aria-current="page" (click)="goTohome()">Home</a>
+                </li> -->
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active-link" href="#">Shop</a>
+                </li> -->
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active-link" (click)="goToCategories()">Categories</a>
+                </li> -->
+
+
+                <div class="input-group" style="width: 300px;">
+                    <span class="input-group-text">
+                    <i class="bi bi-filter"></i> <!-- Bootstrap Icons -->
+                    </span>
+                    <input class="form-control me-2 text-muted" type="search" placeholder="filter category" aria-label="Search" [(ngModel)]="searchQuery" (input)="onSearchChange()" />
+                </div>
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active-link" href="#">FAQs</a>
+                </li> -->
+
+
+            </ul>
+
+
+
+
+            <div class="actions">
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger m-2 bi bi-lock">&nbsp;&nbsp;Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
