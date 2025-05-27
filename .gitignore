@@ -26,3 +26,6 @@ logs/
 *.log
 *.bak
 *.swp
+
+#ignore neondb
+neondb.py

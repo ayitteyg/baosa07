@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model  # Add this import at the top
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
 from django.conf import settings
@@ -13,7 +14,13 @@ class Member(models.Model):
         ('member', 'Member'),
     ]
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='member_profile', default=1)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='member_profile',
+        null=True,
+        blank=True  # Recommended to add this
+    )
     name = models.CharField(max_length=100)
     contact = models.CharField(max_length=20)
     location = models.CharField(max_length=100)
@@ -24,6 +31,15 @@ class Member(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        User = get_user_model()  # Get the actual User model class
+        if not self.user_id:  # Only if user isn't already assigned
+            try:
+                self.user = User.objects.get(username=self.contact)
+            except User.DoesNotExist:
+                pass  # Or handle the case where user doesn't exist
+        super().save(*args, **kwargs)
 
 
 

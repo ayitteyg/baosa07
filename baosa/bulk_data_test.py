@@ -7,6 +7,7 @@ from faker import Faker
 from random import choice
 from random import choice, randint, uniform
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError  # Import IntegrityError
 
 
 
@@ -47,28 +48,81 @@ def load_dummy_members(num_records=50):
 
 
 
-def add_member():
-    CATEGORY_CHOICES = ['executive', 'member']
-    MARITAL_STATUSES = ['married', 'single']
+def create_single_member(name, contact, location, work, marital_status, category='member'):
+    User = get_user_model()
 
-    members = []
-
-    
-    member = Member(
-        name=fake.name(),
-        contact=fake.phone_number(),
-        location=fake.city(),
-        work=fake.job(),
-        marital_status=choice(MARITAL_STATUSES),
-        category=choice(CATEGORY_CHOICES),
-        user= CustomUser.objects.get(id=1)
+    # Create or get user
+    user, created = User.objects.get_or_create(
+        username=contact,
+        defaults={'is_executive': category == 'executive'}
     )
-    members.append(member)
+    if created:
+        user.set_password('baosa@2007')  # Default password
+        user.save()
 
-    Member.objects.bulk_create(members)
-    print(f"✅ Successfully created {len(members)} dummy members.")
+    # Create Member
+    member, created = Member.objects.get_or_create(
+        contact=contact,
+        defaults={
+            'user': user,
+            'name': name,
+            'location': location,
+            'work': work,
+            'marital_status': marital_status,
+            'category': category
+        }
+    )
+
+    print(f"✅ Member {'created' if created else 'already exists'}: {member.name}")
+    return member
+
     
     
+    
+def bulk_create_members(members_data: list):
+    created_members = []
+
+    for data in members_data:
+        name = data.get('name')
+        contact = data.get('contact')
+        location = data.get('location')
+        work = data.get('work')
+        marital_status = data.get('marital_status')
+        category = data.get('category', 'member')
+
+        member = create_single_member(
+            name=name,
+            contact=contact,
+            location=location,
+            work=work,
+            marital_status=marital_status,
+            category=category
+        )
+        created_members.append(member)
+
+    print(f"✅ Bulk created {len(created_members)} members.")
+    return created_members
+
+
+
+members_list = [
+    {
+        'name': 'John Doe',
+        'contact': '0551234567',
+        'location': 'Accra',
+        'work': 'Carpenter',
+        'marital_status': 'single',
+        'category': 'member'
+    },
+    {
+        'name': 'Jane Smith',
+        'contact': '0249876543',
+        'location': 'Kumasi',
+        'work': 'Trader',
+        'marital_status': 'married',
+        'category': 'executive'
+    }
+]
 
 
 
@@ -137,47 +191,37 @@ def add_receipt():
 
 def create_test_users():
     CustomUser = get_user_model()
-    fake = Faker()
-    
-   
-    
-    # Create users
-    users = []
-      
-    # Regular users
-    # for i in range (1,4):
-    #     user = AppUser.objects.create_user(
-    #         username=f'user{i}',
-    #         email=fake.email(),
-    #         password=f'user{i}123',
-    #         name=fake.name(),
-    #         church=choice([ch[0] for ch in CHURCH]),
-    #         department=choice([dpt[0] for dpt in DEPARTMENT_CHOICES]),
-    #         contact=f'0244{fake.random_number(digits=6, fix_len=True)}',
-    #         is_local=fake.boolean(chance_of_getting_true=70),
-    #         is_district=fake.boolean(chance_of_getting_true=30),
-    #         is_officer=fake.boolean(chance_of_getting_true=20)
-    #     )
-    #     users.append(user)
-        
-    
-    user = CustomUser.objects.create_user(
-            username='Akwasi Owusu',
-            email=fake.email(),
-            password='owusu123',
-            name=fake.name(),
-            church='Achimota',
-            department="Interest Coordinator",
-            contact=f'0244{fake.random_number(digits=6, fix_len=True)}',
-            is_local=True,
-            is_district=False,
-            is_officer=False
+    try:
+        # Create single user
+        user = CustomUser.objects.create_user(
+            username='1234567890',  # Should match member's contact if using your association logic
+            password='baosa@2007',
         )
+        print(f"✅ Successfully created user: {user.username}")
+        return [user]  # Return as list to match your original return format
     
-    users.append(user)
-        
-    print(f"✅ Successfully created {len(users)} users data.")
-    return users
+    except IntegrityError:
+        print("⚠️ User already exists")
+        return []
+    except Exception as e:
+        print(f"❌ Error creating user: {str(e)}")
+        return []
+
+
+
+def create_app_users(usernames: list):
+    CustomUser = get_user_model()
+    count = 0
+
+    for usr in usernames:
+        if not CustomUser.objects.filter(username=usr).exists():
+            user = CustomUser(username=usr)
+            user.set_password('baosa@2007')  # ✅ hashes password
+            user.save()
+            count += 1
+
+    print(f"✅ Successfully created {count} users.")
+
 
 
 #runing data
