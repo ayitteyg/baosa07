@@ -88,9 +88,9 @@ AUTHENTICATION_BACKENDS = [
 
 # Allow only your frontend (don't use '*')
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200",
-    "http://192.168.55.136:4200",
+    "https://baosa07.onrender.com",  # Angular frontend URL (Render)
+    "http://localhost:4200",         # Optional: for local dev
+    "http://127.0.0.1:4200", 
 ]
 
 # Allow cookies, tokens, etc. to be sent
@@ -214,6 +214,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 #media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/') # 'media' folder contains my media
