@@ -46,7 +46,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -94,7 +94,7 @@ AUTHENTICATION_BACKENDS = [
 
 # Allow only your frontend (don't use '*')
 CORS_ALLOWED_ORIGINS = [
-    "https://baosa07.onrender.com",  # Angular frontend URL (Render)
+    "https://baosa-07.onrender.com",  # Angular frontend URL (Render)
     "http://localhost:4200",         # Optional: for local dev
     "http://127.0.0.1:4200", 
 ]
