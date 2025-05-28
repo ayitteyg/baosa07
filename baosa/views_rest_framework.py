@@ -8,6 +8,10 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        
+        print("AUTH POST DATA:", request.data)  # Add this
+        
+        
         return Response({
             'token': token.key,
             'id': user.id,

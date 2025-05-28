@@ -47,7 +47,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 DEBUG = False
 
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['baosa-07.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['baosa-07.onrender.com', 'baosa07.onrender.com','localhost', '127.0.0.1']
 
 
 
