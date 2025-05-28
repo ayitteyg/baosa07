@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 
+""" from django.core.management.utils import get_random_secret_key
+print(get_random_secret_key()) """
+
 from pathlib import Path
 import os
 import environ
@@ -29,8 +32,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fy-y+409f&0mtov_l!nb=pfbg__r1+de^f%!vhfe6aab_ysgf('
+
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY environment variable is not set")
 
 
 # Initialize environment variables
