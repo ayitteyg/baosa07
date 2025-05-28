@@ -46,7 +46,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['baosa-07.onrender.com', 'localhost', '127.0.0.1']
+
+
 
 
 # Application definition
