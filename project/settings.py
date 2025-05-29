@@ -46,7 +46,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-#ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['baosa-07.onrender.com', 'baosa07.onrender.com','localhost', '127.0.0.1']
 
 
@@ -100,6 +100,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://baosa-07.onrender.com",  # Angular frontend URL (Render)
     "http://localhost:4200",         # Optional: for local dev
     "http://127.0.0.1:4200", 
+    "http://127.0.0.1:8000",  # Angular default dev server
+    "http://localhost:8000",   # Django backend
 ]
 
 # Allow cookies, tokens, etc. to be sent
@@ -120,10 +122,18 @@ default_headers = [
     'x-requested-with',
 ]
 # Optional: Allow all methods and headers
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'Authorization',
-    'Content-Type',
+CORS_ALLOW_HEADERS = default_headers
+
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",  # Critical for preflight
 ]
+
 
 ROOT_URLCONF = 'project.urls'
 

@@ -28,8 +28,6 @@ router.register(r'messages', viewset.MessageViewSet)
 
 urlpatterns = [
     path('api/token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
-   
-    path('admin/', admin.site.urls),
     path('admin_redirect/', lambda request: redirect('/admin/'), name='admin_redirect'),
     path('api/', include(router.urls)),
     path('', login_view, name='login'),
