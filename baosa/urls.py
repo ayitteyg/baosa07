@@ -5,8 +5,8 @@ from baosa import viewset
 from django.shortcuts import redirect
 from django.contrib.auth.views import LoginView, LogoutView
 from .views_summary import (MemberReceiptsView, ReceiptSummaryView, 
-                            ReceiptCreateView, MemberListView,
-                            PaymentCreateView, PaymentListView)
+                            ReceiptCreateView, MyEventsCreateView, EventCreateView,
+                             FinanceSummaryView, MemberCreateView)
 from .views_rest_framework import CustomAuthToken
 
 from .viewset import (PaymentViewSet, ReceiptViewSet,
@@ -16,7 +16,7 @@ from .viewset import (PaymentViewSet, ReceiptViewSet,
 
 
 from .views import (
-    login_view,  login_failed_view, homepage_page_view, login_out_view)
+    login_view,  login_failed_view, homepage_page_view, login_out_view, get_member_id)
 
 router = routers.DefaultRouter()
 router.register(r'members', viewset.MemberViewSet)
@@ -41,14 +41,9 @@ urlpatterns += [
     path('api/receipts/member/<int:member_id>/', MemberReceiptsView.as_view()),
     path('api/receipts/summary/<int:member_id>/', ReceiptSummaryView.as_view()),
     path('api/receipts/', ReceiptCreateView.as_view(), name='receipt-create'),
+    path('api/finance-summary/', FinanceSummaryView.as_view(), name='finance-summary'),
     
-    # Receipts
-    # path('api/receipts/', ReceiptCreateView.as_view({
-    #     'get': 'list',
-    #     'post': 'create'
-    # }), name='receipt-list'),
-    # path('api/receipts/summary/', ReceiptSummaryView.as_view(), name='receipt-summary'),
-    # path('api/receipts/member/', MemberReceiptsView.as_view(), name='member-receipts'),  
+
   ]
 
 
@@ -71,11 +66,15 @@ urlpatterns +=[
         'get': 'list',
         'post': 'create'
     }), name='event-list-create'),
+    path('api/events-new/', EventCreateView.as_view(), name='event-new'),
     
     
     path('api/event-types/', MyEventsViewSet.as_view({
-    'get': 'list'
+    'get': 'list',
+    'post': 'create'
     }), name='event-types-list'),
+    
+     path('api/create-event-type/', MyEventsCreateView.as_view(), name='create-event'),
 ]
 
 
@@ -95,7 +94,7 @@ urlpatterns +=[
         'delete': 'destroy'
     }), name='member-detail'),
     
-    
+     path('api/member-id/', get_member_id, name='get_member_id'),
       # Members
-    # path('api/members/', MemberListView.as_view(), name='member-list'),
+    path('api/members/', MemberCreateView.as_view(), name='member_new'),
 ]

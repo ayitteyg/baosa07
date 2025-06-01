@@ -23,9 +23,9 @@ class MemberViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         summary = {
             'total_members': queryset.count(),
-            'total_male': queryset.filter(marital_status='male').count(),
-            'total_female': queryset.filter(marital_status='female').count(),
-            'total_married': queryset.filter(marital_status='married').count(),
+            'total_male': queryset.filter(gender='M').count(),
+            'total_female': queryset.filter(gender='F').count(),
+            'total_married': queryset.filter(marital_status='Married').count(),
             'total_single': queryset.filter(marital_status='single').count(),
         }
         serializer = MemberSummarySerializer(summary)
@@ -46,7 +46,7 @@ class EventViewSet(viewsets.ModelViewSet):
 class MyEventsViewSet(viewsets.ModelViewSet):
     queryset = MyEvents.objects.all()
     serializer_class = MyEventsSerializer
-    permission_classes = [IsAuthenticated]
+   
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()

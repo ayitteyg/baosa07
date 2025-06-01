@@ -13,6 +13,10 @@ class Member(models.Model):
         ('executive', 'Executive'),
         ('member', 'Member'),
     ]
+    
+    gender = [('M', 'M'), ('F', 'F')]
+    
+    m_status = [('Married', 'Married'), ('single', 'single')]
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -22,10 +26,13 @@ class Member(models.Model):
         blank=True  # Recommended to add this
     )
     name = models.CharField(max_length=100)
+    gender = models.CharField(choices=gender)
     contact = models.CharField(max_length=20)
-    location = models.CharField(max_length=100)
-    work = models.CharField(max_length=100)
-    marital_status = models.CharField(max_length=20)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    work = models.CharField(max_length=100, blank=True, null=True)
+    marital_status = models.CharField(max_length=20, blank=True, null=True, choices=m_status)
+    next_of_kin = models.CharField(max_length=100, blank=True, null=True)  # Add this
+    next_of_kin_cont = models.CharField(max_length=15, blank=True, null=True)  # Add this
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='member')
     date_joined = models.DateField(auto_now_add=True)
 
@@ -91,7 +98,7 @@ class Event(models.Model):
     event_description = models.TextField()
     member = models.ForeignKey(Member, on_delete=models.CASCADE, default="")
     def __str__(self):
-        return self.event
+        return self.name
 
 
 class Message(models.Model):

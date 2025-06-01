@@ -304,7 +304,12 @@ def load_json_to_model(json_data, model, mapping=None, update_existing=False):
 
 def convert_to_json(file):
     excel_to_json(f'data_excel/{file}.xlsx', f'data_json/{file}.json')
-    
+
+def read_file (file):
+    with open(f'data_json/{file}.json', 'r') as f:
+        member_data = json.load(f)
+        for data in member_data:
+            print(data['contact'])
 
 def load_json_model(file, model):
     success, errors, error_log = load_json_to_model(f'data_json/{file}.json', model)

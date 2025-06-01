@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth import authenticate, login
 from .bulk_data_test import run_data
 from . models import Member, AnnualDues, CustomUser, Receipt
-from . functions import print_model_objects, reset_model_data
+from . functions import print_model_objects, reset_model_data, convert_to_json, read_file
 from .views_summary import MemberReceiptsView
 # Create your views here.
 
@@ -15,6 +15,8 @@ from .views_summary import MemberReceiptsView
 
 #reset_model_data(AnnualDues)
 #print_model_objects(Member)
+#convert_to_json('members_data')
+#read_file('members_data')
 
 
 class CustomLoginView(View):
@@ -84,3 +86,33 @@ class HomepageView(TemplateView):
         return context
     
 homepage_page_view = HomepageView.as_view() 
+
+
+
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import csrf_exempt
+from .models import Member  # Update with your actual app name
+
+
+
+@csrf_exempt
+def get_member_id(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+    elif request.method == 'POST':
+        import json
+        body = json.loads(request.body)
+        username = body.get('username')
+    else:
+        return JsonResponse({'error': 'Only GET or POST allowed'}, status=405)
+
+    try:
+        User = get_user_model()
+        user = User.objects.get(username=username)
+        member = user.member_profile
+        return JsonResponse({'user_id': member.user})
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Member.DoesNotExist:
+        return JsonResponse({'error': 'Member profile not found'}, status=404)

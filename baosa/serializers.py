@@ -84,27 +84,48 @@ class MyEventsSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    event = MyEventsSerializer(read_only=True)
-    event_id = serializers.PrimaryKeyRelatedField(
-        queryset=MyEvents.objects.all(),
-        source='event',
-        write_only=True
-    )
-    member = MemberSerializer(read_only=True)
-    member_id = serializers.PrimaryKeyRelatedField(
-        queryset=Member.objects.all(),
-        source='member',
-        write_only=True
-    )
-    
     class Meta:
         model = Event
         fields = [
-            'id', 'event', 'event_id', 
-            'event_date', 'event_description',
-            'member', 'member_id'
+            'event',  # This expects the ID of a MyEvents instance
+            'event_date',
+            'event_description',
+            'member'  # This expects the ID of a Member instance
         ]
         extra_kwargs = {
             'event_date': {'required': True},
             'event_description': {'required': True}
         }
+
+
+
+
+class MemberCreateViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = [
+            'name',
+            'gender',
+            'contact',
+            'location',
+            'work',
+            'marital_status',
+            'next_of_kin',
+            'next_of_kin_cont',
+            'category',
+        ]
+
+    def validate_gender(self, value):
+        valid_genders = dict(Member.gender).keys()
+        if value not in valid_genders:
+            raise serializers.ValidationError(f"Gender must be one of: {', '.join(valid_genders)}")
+        return value
+
+    def validate_category(self, value):
+        valid_categories = dict(Member.CATEGORY_CHOICES).keys()
+        if value not in valid_categories:
+            raise serializers.ValidationError(f"Category must be one of: {', '.join(valid_categories)}")
+        return value
+
+    def create(self, validated_data):
+        return Member.objects.create(**validated_data)
