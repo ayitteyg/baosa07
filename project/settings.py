@@ -172,28 +172,56 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 
 
 # Alternative: Parse DATABASE_URL directly (if using a single env variable)
+# if 'DATABASE_URL' in os.environ:
+#     db_url = urlparse(os.getenv('DATABASE_URL'))
+#     DATABASES['default'] = {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': db_url.path[1:],  # Removes leading '/'
+#         'USER': db_url.username,
+#         'PASSWORD': db_url.password,
+#         'HOST': db_url.hostname,
+#         'PORT': db_url.port or 5432,
+#         'OPTIONS': {
+#             # 'sslrootcert': os.path.join(BASE_DIR, 'prod-ca-2021.crt'),
+#             'connect_timeout': 10,
+#         },
+#     }
+
+
+
+
+DATABASES = {}
+
 if 'DATABASE_URL' in os.environ:
     db_url = urlparse(os.getenv('DATABASE_URL'))
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': db_url.path[1:],  # Removes leading '/'
+        'NAME': db_url.path[1:],  # removes leading '/'
         'USER': db_url.username,
         'PASSWORD': db_url.password,
         'HOST': db_url.hostname,
         'PORT': db_url.port or 5432,
         'OPTIONS': {
-            # 'sslrootcert': os.path.join(BASE_DIR, 'prod-ca-2021.crt'),
             'connect_timeout': 10,
+            'sslmode': 'require',
         },
+    }
+else:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 
 

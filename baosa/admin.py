@@ -38,3 +38,4 @@ class MemberAdmin(admin.ModelAdmin):
 @admin.register(AnnualDues)
 class AnnualDuesAdmin(admin.ModelAdmin):
     pass
+

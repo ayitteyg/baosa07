@@ -15,7 +15,7 @@ from .views_summary import MemberReceiptsView
 
 #reset_model_data(AnnualDues)
 #print_model_objects(Member)
-#convert_to_json('members_data')
+#convert_to_json('members_receipt')
 #read_file('members_data')
 
 

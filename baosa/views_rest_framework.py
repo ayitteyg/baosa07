@@ -19,7 +19,8 @@ class CustomAuthToken(ObtainAuthToken):
 
         return Response({
             'token': token.key,
-            'id': member_id,  # Return Member.id here instead of User.id
+            'mid': member_id,  # Return Member.id here instead of User.id
+             'usid': user.id,
             'username': user.username,
             'member_name':member_name,
             'isExecutive': user.is_executive,

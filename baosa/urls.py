@@ -11,7 +11,7 @@ from .views_rest_framework import CustomAuthToken
 
 from .viewset import (PaymentViewSet, ReceiptViewSet,
                       EventViewSet, MyEventsViewSet, 
-                      MemberViewSet2, MemberViewSet)
+                       MemberViewSet)
 
 
 
@@ -24,7 +24,8 @@ router.register(r'receipts', viewset.ReceiptViewSet)
 router.register(r'payments', viewset.PaymentViewSet)
 router.register(r'events', viewset.EventViewSet)
 router.register(r'messages', viewset.MessageViewSet)
-# router.register(r'members', MemberViewSet2, basename='member')
+
+
 
 urlpatterns = [
     path('api/token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
@@ -80,14 +81,8 @@ urlpatterns +=[
 
 #members url
 urlpatterns +=[
-     path('api/members/', MemberViewSet2.as_view({
-        'get': 'list',
-        'post': 'create'
-    }), name='member-list'),
-    path('api/members/summary/', MemberViewSet2.as_view({
-        'get': 'summary'
-    }), name='member-summary'),
-    path('api/members/<int:pk>/', MemberViewSet2.as_view({
+    
+    path('api/members/<int:pk>/', MemberViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
@@ -96,5 +91,5 @@ urlpatterns +=[
     
      path('api/member-id/', get_member_id, name='get_member_id'),
       # Members
-    path('api/members/', MemberCreateView.as_view(), name='member_new'),
+    #path('api/members/', MemberCreateView.as_view(), name='member_new'),
 ]

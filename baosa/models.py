@@ -26,7 +26,7 @@ class Member(models.Model):
         blank=True  # Recommended to add this
     )
     name = models.CharField(max_length=100)
-    gender = models.CharField(choices=gender)
+    gender = models.CharField(choices=gender, max_length=2)
     contact = models.CharField(max_length=20)
     location = models.CharField(max_length=100, blank=True, null=True)
     work = models.CharField(max_length=100, blank=True, null=True)
@@ -68,7 +68,12 @@ class Receipt(models.Model):
 
 
 class AnnualDues(models.Model):
-    year = models.CharField(unique=True)
+    CATEGORY_CHOICES = [
+        ('dues', 'Dues'),
+        ('seed_fund', 'Seed Fund')
+    ]
+    year = models.IntegerField(unique=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="dues")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     def __str__(self):
         return f"{self.year} - {self.amount}"

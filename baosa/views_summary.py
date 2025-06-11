@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Sum
@@ -11,9 +12,9 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import (
     ReceiptCreateSerializer, MemberSerializer, 
     PaymentCreateSerializer, PaymentListSerializer,
-    MyEventsSerializer, EventSerializer, MemberCreateViewSerializer
+    MyEventsSerializer, EventSerializer, MemberCreateViewSerializer, MemberSummarySerializer
 )
-
+from rest_framework.decorators import action
 from collections import defaultdict
 from decimal import Decimal
 from django.db.models.functions import ExtractYear
@@ -30,10 +31,7 @@ class MemberListView(generics.ListAPIView):
 
 class MemberReceiptsView(APIView):
     def get(self, request, member_id):
-        member = get_object_or_404(Member, id=member_id)
-        
-        member = choice(Member.objects.all())
-        
+        member = get_object_or_404(Member, id=member_id) 
         receipts = Receipt.objects.filter(member=member).order_by('-receipt_date')
         
         # Group by year
@@ -57,7 +55,6 @@ class MemberReceiptsView(APIView):
             })
         #print(serialized_data)
         return Response(serialized_data, status=status.HTTP_200_OK)
-
 
 
 class ReceiptSummaryView(APIView):
@@ -84,20 +81,48 @@ class ReceiptSummaryView(APIView):
 
         # Ensure total dues paid exists
         total_dues_paid = result.get('dues', 0)
+        
+        
+        annual_dues_aggregate = AnnualDues.objects.filter(category='dues').aggregate(total=Sum('amount'))
+       #print("🔍 Annual dues aggregate:", annual_dues_aggregate)
+
+        total_annual_dues = int(annual_dues_aggregate['total'] if annual_dues_aggregate['total'] is not None else 0)
+        #print("✅ Total annual dues computed:", total_annual_dues)
 
         # Compute annual dues
-        total_annual_dues = AnnualDues.objects.aggregate(total=Sum('amount'))['total'] or 0
-
-        difference =  total_dues_paid - float(total_annual_dues)
+        # total_annual_dues = AnnualDues.objects.filter(category='dues').aggregate(
+        #     total=Sum('amount')
+        # )['total'] or 0
+        
+       # total_annual_dues = 100.0
+       
+        difference =  total_dues_paid - (total_annual_dues)
         dues_status = "In advance" if difference >= 0 else "In arrears"
+        
+        
+        #define dues status
+        active_threshold = total_annual_dues * 0.7
+
+        # Get the member's receipts
+        receipts = Receipt.objects.filter(member=member)
+        dues_paid = receipts.filter(category='dues').aggregate(total=Sum('amount'))['total'] or 0
+        has_contribution = receipts.filter(category='contribution').exists()
+        has_seed_fund = receipts.filter(category='seed_fund').exists()
+
+        is_active = (
+            dues_paid >= active_threshold and
+            has_contribution and
+            has_seed_fund
+        )
 
         result.update({
             'total_annual_dues': float(total_annual_dues),
             'dues_difference': abs(difference),
-            'dues_status': dues_status
+            'dues_status': dues_status,
+            "status": "active" if is_active else "inactive"
         })
 
-        print("➡️ Final result returned to frontend:", result)
+       # print("➡️ Final result returned to frontend:", result)
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -248,5 +273,5 @@ class FinanceSummaryView(APIView):
             'payments_details': payments_details,
             'current_balance': current_balance
         }
-        print(result)
+        #print(result)
         return Response(result, status=status.HTTP_200_OK)

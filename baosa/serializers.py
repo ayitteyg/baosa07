@@ -29,6 +29,8 @@ class MemberSummarySerializer(serializers.Serializer):
     total_female = serializers.IntegerField()
     total_married = serializers.IntegerField()
     total_single = serializers.IntegerField()
+    total_active = serializers.IntegerField()
+    total_inactive = serializers.IntegerField()
 
 class ReceiptListSerializer(serializers.ModelSerializer):
     class Meta:
