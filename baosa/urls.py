@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.views import LoginView, LogoutView
 from .views_summary import (MemberReceiptsView, ReceiptSummaryView, 
                             ReceiptCreateView, MyEventsCreateView, EventCreateView,
-                             FinanceSummaryView, MemberCreateView)
+                             FinanceSummaryView, MemberSummaryAPIView)
 from .views_rest_framework import CustomAuthToken
 
 from .viewset import (PaymentViewSet, ReceiptViewSet,
@@ -24,6 +24,7 @@ router.register(r'receipts', viewset.ReceiptViewSet)
 router.register(r'payments', viewset.PaymentViewSet)
 router.register(r'events', viewset.EventViewSet)
 router.register(r'messages', viewset.MessageViewSet)
+
 
 
 
@@ -90,6 +91,6 @@ urlpatterns +=[
     }), name='member-detail'),
     
      path('api/member-id/', get_member_id, name='get_member_id'),
-      # Members
-    #path('api/members/', MemberCreateView.as_view(), name='member_new'),
+     path('api/members-dashboard/summary/', MemberSummaryAPIView.as_view(), name='member-summary'),
+    
 ]

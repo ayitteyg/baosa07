@@ -128,6 +128,122 @@ class ReceiptSummaryView(APIView):
 
 
 
+
+# class MemberViewSetDashboard(viewsets.ModelViewSet):
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
+    permission_classes = [IsAuthenticated]  # Add if needed
+    
+
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        members = self.get_queryset()
+        total_members = members.count()
+
+        
+        annual_dues_aggregate = AnnualDues.objects.filter(category='dues').aggregate(total=Sum('amount'))
+       #print("🔍 Annual dues aggregate:", annual_dues_aggregate)
+
+        total_expected_dues = int(annual_dues_aggregate['total'] if annual_dues_aggregate['total'] is not None else 0)
+        #print("✅ Total annual dues computed:", total_annual_dues)
+
+        active_dues_threshold = int(total_expected_dues) * 0.7
+
+        # Fetch all receipts in one query
+        receipts = Receipt.objects.select_related('member').all()
+
+        # Organize receipts by member ID and category
+        member_receipts = defaultdict(lambda: {'dues': 0, 'contribution': 0, 'seed_fund': 0})
+
+        for r in receipts:
+            member_id = r.member_id
+            if r.category == 'dues':
+                member_receipts[member_id]['dues'] += r.amount
+            elif r.category == 'contribution':
+                member_receipts[member_id]['contribution'] += r.amount
+            elif r.category == 'seed_fund':
+                member_receipts[member_id]['seed_fund'] += r.amount
+
+        # Count active members
+        total_active = 0
+        for member in members:
+            rec = member_receipts.get(member.id, {})
+            if (
+                rec.get('dues', 0) >= active_dues_threshold and
+                rec.get('contribution', 0) > 0 and
+                rec.get('seed_fund', 0) > 0
+            ):
+                total_active += 1
+
+        total_inactive = total_members - total_active
+        
+        summary = {
+            'total_members': total_members,
+            'total_male': members.filter(gender='M').count(),
+            'total_female': members.filter(gender='F').count(),
+            'total_married': members.filter(marital_status='Married').count(),
+            'total_single': members.filter(marital_status='single').count(),
+            'total_active': total_active,
+            'total_inactive': total_inactive,
+        }
+
+        print(summary)
+        return Response(summary, status=status.HTTP_200_OK)
+
+
+
+class MemberSummaryAPIView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        members = Member.objects.all()
+        total_members = members.count()
+
+        # Aggregate total expected dues
+        annual_dues_aggregate = AnnualDues.objects.filter(category='dues').aggregate(total=Sum('amount'))
+        total_expected_dues = int(annual_dues_aggregate['total'] if annual_dues_aggregate['total'] is not None else 0)
+        active_dues_threshold = total_expected_dues * 0.7
+
+        # Fetch all receipts
+        receipts = Receipt.objects.select_related('member').all()
+
+        # Organize receipts by member ID and category
+        member_receipts = defaultdict(lambda: {'dues': 0, 'contribution': 0, 'seed_fund': 0})
+        for r in receipts:
+            member_id = r.member_id
+            if r.category == 'dues':
+                member_receipts[member_id]['dues'] += r.amount
+            elif r.category == 'contribution':
+                member_receipts[member_id]['contribution'] += r.amount
+            elif r.category == 'seed_fund':
+                member_receipts[member_id]['seed_fund'] += r.amount
+
+        # Count active members
+        total_active = 0
+        for member in members:
+            rec = member_receipts.get(member.id, {})
+            if (
+                rec.get('dues', 0) >= active_dues_threshold and
+                rec.get('contribution', 0) > 0 and
+                rec.get('seed_fund', 0) > 0
+            ):
+                total_active += 1
+
+        total_inactive = total_members - total_active
+
+        summary = {
+            'total_members': total_members,
+            'total_male': members.filter(gender='M').count(),
+            'total_female': members.filter(gender='F').count(),
+            'total_married': members.filter(marital_status='Married').count(),
+            'total_single': members.filter(marital_status='single').count(),
+            'total_active': total_active,
+            'total_inactive': total_inactive,
+        }
+
+        return Response(summary, status=status.HTTP_200_OK)
+
+
 """  create/update viewset  """
 class ReceiptCreateView(generics.CreateAPIView):
     queryset = Receipt.objects.all()
